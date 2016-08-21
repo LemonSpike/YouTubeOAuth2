@@ -13,7 +13,7 @@ import UIKit
 class ViewController: UIViewController {
     
     private let kKeychainItemName = "Gmail API"
-    private let kClientID = "192877572614-h8luf2s48sp0b4ikub5fipb22gm00nb3.apps.googleusercontent.com"
+    private let kClientID = "192877572614-k4ljl168palm9oq5skbgonsagf17t20h.apps.googleusercontent.com"
     
     // If modifying these scopes, delete your previously saved credentials by
     // resetting the iOS simulator or uninstall the app.
@@ -37,7 +37,7 @@ class ViewController: UIViewController {
         if let auth = GTMOAuth2ViewControllerTouch.authForGoogleFromKeychainForName(
             kKeychainItemName,
             clientID: kClientID,
-            clientSecret: "7o9FEQUiOmK885m15iyRLXgw") {
+            clientSecret: nil) {
             service.authorizer = auth
         }
         
