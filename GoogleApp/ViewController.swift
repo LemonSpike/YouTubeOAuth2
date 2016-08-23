@@ -6,7 +6,7 @@
 //  Copyright © 2016 Pranav Kasetti. All rights reserved.
 //
 
-import GoogleAPIClient
+import GoogleAPIClientForREST
 import GTMOAuth2
 import UIKit
 
@@ -17,10 +17,12 @@ class ViewController: UIViewController {
     
     // If modifying these scopes, delete your previously saved credentials by
     // resetting the iOS simulator or uninstall the app.
-    private let scopes = [kGTLAuthScopeYouTubeUpload]
+    private let scopes = [kGTLRAuthScopeYouTubeUpload, kGTLRAuthScopeYouTube]
     
-    private let service = GTLServiceYouTube()
+    private let service = GTLRYouTubeService()
     let output = UITextView()
+    var counter=0
+    let query = GTLRYouTubeQuery_PlaylistItemsList.queryWithPart("snippet")
     
     // When the view loads, create necessary subviews
     // and initialize the Gmail API service
@@ -34,11 +36,14 @@ class ViewController: UIViewController {
         
         view.addSubview(output);
         
+        print(scopes)
+        
         if let auth = GTMOAuth2ViewControllerTouch.authForGoogleFromKeychainForName(
             kKeychainItemName,
             clientID: kClientID,
             clientSecret: nil) {
             service.authorizer = auth
+            service.shouldFetchNextPages = false
         }
         
     }
@@ -61,8 +66,10 @@ class ViewController: UIViewController {
     // Construct a query and get a list of upcoming labels from the gmail API
     func fetchLabels() {
         output.text = "Getting labels..."
+        query.playlistId = "PLVC8GDo2AhwHf38gpDahIdN5KQT060Wmq"
+        query.maxResults=3
+        print(query)
         
-        let query = GTLQueryYouTube.queryForPlaylistsListWithPart("snippet")
         service.executeQuery(query,
                              delegate: self,
                              didFinishSelector: "displayResultWithTicket:finishedWithObject:error:"
@@ -70,27 +77,48 @@ class ViewController: UIViewController {
     }
     
     // Display the labels in the UITextView
-    func displayResultWithTicket(ticket : GTLServiceTicket,
-                                 finishedWithObject labelsResponse : GTLYouTubePlaylistListResponse,
+    func displayResultWithTicket(ticket : GTLRServiceTicket,
+                                 finishedWithObject playlistItemList: GTLRYouTube_PlaylistItemListResponse,
                                                     error : NSError?) {
         
         if let error = error {
             showAlert("Error", message: error.localizedDescription)
             return
         }
-        
-        var labelString = ""
-        
-        if !labelsResponse.items().isEmpty {
-            labelString += "Labels:\n"
-            for label in labelsResponse.items() as! [GTLYouTubePlaylistItem] {
-                labelString += "\(label.snippet.channelTitle)\n"
+        if output.text=="Getting labels..." {
+            var labelString = ""
+            
+            if !playlistItemList.items!.isEmpty {
+                labelString += "Labels:\n"
+                for label in playlistItemList.items! {
+                    labelString += "\(label.snippet!.title)\n"
+                }
+            } else {
+                labelString = "No labels found."
             }
+            counter=counter+1
+            output.text = labelString
         } else {
-            labelString = "No labels found."
+            if !playlistItemList.items!.isEmpty {
+                var labelString = output.text as String
+                for label in playlistItemList.items! {
+                    labelString += "\(label.snippet!.title!)\n"
+                }
+                counter=counter+1
+                output.text = labelString
+            }
         }
         
-        output.text = labelString
+        if ((playlistItemList.nextPageToken) != nil && counter==1) {
+            let query2 = GTLRYouTubeQuery_PlaylistItemsList.queryWithPart("snippet")
+            query2.playlistId = "PLVC8GDo2AhwHf38gpDahIdN5KQT060Wmq"
+            query2.maxResults=3
+            query2.pageToken = playlistItemList.nextPageToken
+            service.executeQuery(query2,
+                                 delegate: self,
+                                 didFinishSelector: "displayResultWithTicket:finishedWithObject:error:"
+            )
+        }
         
     }
     
@@ -101,11 +129,16 @@ class ViewController: UIViewController {
         return GTMOAuth2ViewControllerTouch(
             scope: scopeString,
             clientID: kClientID,
-            clientSecret: "7o9FEQUiOmK885m15iyRLXgw",
+            clientSecret: nil,
             keychainItemName: kKeychainItemName,
             delegate: self,
             finishedSelector: "viewController:finishedWithAuth:error:"
         )
+        
+    }
+    
+    func signOut() {
+        GTMOAuth2ViewControllerTouch.removeAuthFromKeychainForName(kKeychainItemName)
     }
     
     // Handle completion of the authorization process, and update the Gmail API

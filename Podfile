@@ -1,7 +1,6 @@
 platform :ios, '7.0'
 use_frameworks!
 target 'GoogleApp' do
-    pod 'GoogleAPIClient/Gmail', '~> 1.0.2'
-    pod 'GoogleAPIClient/YouTube', '~> 1.0.2'
+    pod 'GoogleAPIClientForREST/YouTube', :git => 'https://github.com/google/google-api-objectivec-client-for-rest.git'
     pod 'GTMOAuth2', '~> 1.1.0'
 end

@@ -14,7 +14,7 @@
 			<key>isShown</key>
 			<false/>
 		</dict>
-		<key>GoogleAPIClient.xcscheme</key>
+		<key>GoogleAPIClientForREST.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false/>
@@ -27,12 +27,12 @@
 	</dict>
 	<key>SuppressBuildableAutocreation</key>
 	<dict>
-		<key>7B5B172D6506ABF5E3D610230BB03129</key>
+		<key>8D9082159A5ADBB80883E78CFE7E686A</key>
 		<dict>
 			<key>primary</key>
 			<true/>
 		</dict>
-		<key>88417137D39263F4B553B3E059619E17</key>
+		<key>B86F736AB0D55CF52770A875EB6D5126</key>
 		<dict>
 			<key>primary</key>
 			<true/>
@@ -42,7 +42,7 @@
 			<key>primary</key>
 			<true/>
 		</dict>
-		<key>F42FDC405D789C1CA6E36A153EEEB541</key>
+		<key>E9954DD48D41FE78C4998FA5D579BB32</key>
 		<dict>
 			<key>primary</key>
 			<true/>
